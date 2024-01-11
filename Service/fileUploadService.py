@@ -10,12 +10,13 @@ from Util.databaseInit import session_factory
 from Util.tableInit import STATIC_FILE_DIRECTORY
 
 router = APIRouter(
-    prefix="/files",
+    prefix="/api",
     tags=["files"],
 )
 
 
-@router.post("/files", response_model=ResultModel)
+
+@router.post("/images", response_model=ResultModel)
 async def book_cover_upload(file: UploadFile):
     file.filename = f"book_{time.time()}.jpg"
     # 保存地址
@@ -31,7 +32,7 @@ async def book_cover_upload(file: UploadFile):
 
 
 # 根据文件id进行图像的获取
-@router.get("/files/images/{file_name}")
+@router.get("/images/{file_name}")
 async def get_book_cover_by_ID(file_name: str):
     with session_factory() as session:
         try:
@@ -42,3 +43,6 @@ async def get_book_cover_by_ID(file_name: str):
             return StreamingResponse(image_file, media_type="image/jpg")
         except Exception as e:
             return fail_result(str(e))
+
+
+

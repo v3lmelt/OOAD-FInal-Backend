@@ -34,13 +34,13 @@ async def get_all_dish() -> Page[DishModel]:
 
 
 # 删除指定菜品
-@router.delete("/delete_dish/{id}")
+@router.delete("/delete-dish/{id}")
 async def delete_dish_by_id(id: int):
     with session_factory() as session:
         try:
             data = session.get(DishModel, id)
             # 检查对应的菜品图片是否存在
-            cover_path = os.path.join(STATIC_FILE_DIRECTORY, data.cover)
+            cover_path = os.path.join(STATIC_FILE_DIRECTORY, data.image)
             if os.path.exists(cover_path):
                 os.remove(cover_path)
 
@@ -63,6 +63,8 @@ async def add_book(dish_to_add: DishModel):
                     db_obj.name = dish_to_add.name
                     db_obj.dish_type = dish_to_add.dish_type
                     db_obj.price = dish_to_add.price
+                    db_obj.image = dish_to_add.image
+                    db_obj.ingredients = dish_to_add.ingredients
                     session.add(db_obj)
             else:
                 session.add(dish_to_add)
@@ -84,7 +86,6 @@ async def find_book(dish_to_find: DishQueryModel) -> Page[DishModel]:
                 query = query.where(DishModel.name.like(f"%{dish_to_find.name}%"))
             if dish_to_find.dish_type is not None:
                 query = query.where(DishModel.dish_type.like(f"%{dish_to_find.dish_type}%"))
-
             result = session.exec(query).all()
         except Exception as e:
             return fail_result(str(e))

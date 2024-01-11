@@ -1,4 +1,4 @@
-from Model import accountModel, dishModel, resultModel, tokenModel
+from Model import accountModel, dishModel, resultModel, tokenModel, orderModel, orderContentModel
 from sqlmodel import SQLModel
 
 from Util.databaseInit import engine
