@@ -9,3 +9,8 @@ class OrderModel(SQLModel, table=True):
 
     server_id: Optional[int]
 
+    start_time: Optional[int] = Field(default=1)
+    end_time: Optional[int] = Field(default=-1)
+
+    # 当前状态，0表示还未配餐，1表示正在配餐，2表示配餐完成。
+    current_status: Optional[int] = Field(default=0)
