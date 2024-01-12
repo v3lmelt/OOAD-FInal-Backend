@@ -51,7 +51,10 @@ async def submit_order(order_content: list[OrderContentModel], user: AccountMode
                 if dish_obj.count < item.quantity:
                     return fail_result("该菜品存量不足!")
 
+                # 对应菜品的受欢迎程度 + 点的份数
                 dish_obj.count -= item.quantity
+                dish_obj.popularity += item.quantity
+
                 session.add(dish_obj)
             # 创建后台订单
             print(order_content)
@@ -63,8 +66,8 @@ async def submit_order(order_content: list[OrderContentModel], user: AccountMode
             # quantity: int
 
             json_order_content = json.dumps(order_content, default=OrderContentModel.serializeOrderContent)
+            order_obj = OrderModel(order_content=json_order_content, start_time=time.time(), total_price=total_price)
 
-            order_obj = OrderModel(order_content=json_order_content, start_time=time.time())
             session.add(order_obj)
             session.commit()
         except Exception as e:
@@ -84,7 +87,7 @@ async def get_order_by_id(id: int, user: AccountModel = Depends(get_current_user
 @router.get("/get-order")
 async def get_order(user: AccountModel = Depends(get_current_user)) -> Page[OrderModel]:
     with session_factory() as session:
-        stmt = select(OrderModel)
+        stmt = select(OrderModel).where(OrderModel.current_status != 2)
         order_in_db = session.exec(stmt).all()
         return paginate(order_in_db)
 

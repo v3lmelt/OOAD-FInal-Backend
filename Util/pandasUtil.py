@@ -23,7 +23,9 @@ def sqlmodel_to_df(objects: List[SQLModel], set_index: bool = True) -> pd.DataFr
     return df.set_index(columns[0]) if set_index else df
 
 
-def df_to_sqlmodel(df: pd.DataFrame) -> List[SQLModel]:
+def df_to_sqlmodel(df: pd.DataFrame) -> dict:
     """Convert a pandas DataFrame into a a list of SQLModel objects."""
-    objs = [OrderModel(**row) for row in df.to_dict('records')]
-    return objs
+    dict_df = df.to_dict()
+    return dict_df['sumed']
+
+
