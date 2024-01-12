@@ -72,6 +72,14 @@ async def submit_order(order_content: list[OrderContentModel], user: AccountMode
         return success_result("订单成功创建!")
 
 
+@router.get("/get-order/{id}")
+async def get_order_by_id(id: int, user: AccountModel = Depends(get_current_user)):
+    with session_factory() as session:
+        order = session.get(OrderModel, id)
+        if order is None:
+            return fail_result("该订单不存在!")
+        return success_result(order)
+
 # 获取所有订单内容
 @router.get("/get-order")
 async def get_order(user: AccountModel = Depends(get_current_user)) -> Page[OrderModel]:

@@ -15,11 +15,13 @@ class DishModel(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(default="菜品", max_length=50)
     price: float = Field(default=0.0)
-    image: str = Field(max_length=512)
+    image: str = Field(max_length=512, default="missingno")
     ingredients: str = Field(max_length=512)
     # 注意，菜品类型是int类型！
     dish_type: int = Field(foreign_key="dishtypemodel.id")
     count: int = Field(default=0)
+    # 点过这道菜的人数
+    popularity: int = Field(default=0)
 
 
 # 菜品查询数据验证
