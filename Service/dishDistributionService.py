@@ -23,7 +23,7 @@ router = APIRouter(
 
 
 @router.post("/submit-order")
-async def submit_order(order_content: list[OrderContentModel], user: AccountModel = Depends(get_current_user)):
+async def submit_order(order_content: list[OrderContentModel], seat_id: int, user: AccountModel = Depends(get_current_user)):
     total_price = 0.0
     # 计算商品总价
     for item in order_content:
@@ -66,7 +66,7 @@ async def submit_order(order_content: list[OrderContentModel], user: AccountMode
             # quantity: int
 
             json_order_content = json.dumps(order_content, default=OrderContentModel.serializeOrderContent)
-            order_obj = OrderModel(order_content=json_order_content, start_time=time.time(), total_price=total_price)
+            order_obj = OrderModel(order_content=json_order_content, start_time=time.time(), total_price=total_price, seat_id=seat_id)
 
             session.add(order_obj)
             session.commit()
