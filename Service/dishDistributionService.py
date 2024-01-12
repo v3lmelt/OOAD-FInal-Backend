@@ -5,7 +5,7 @@ from datetime import date
 
 from fastapi import APIRouter, Depends
 from fastapi_pagination import Page, paginate
-from sqlmodel import select
+from sqlmodel import select, or_, and_
 
 from Model.accountModel import AccountModel
 from Model.dishModel import DishModel
@@ -87,7 +87,7 @@ async def get_order_by_id(id: int, user: AccountModel = Depends(get_current_user
 @router.get("/get-order")
 async def get_order(user: AccountModel = Depends(get_current_user)) -> Page[OrderModel]:
     with session_factory() as session:
-        stmt = select(OrderModel).where(OrderModel.current_status != 2)
+        stmt = select(OrderModel).where(and_(OrderModel.current_status != 2, or_(OrderModel.server_id is None, OrderModel.server_id == user.id)))
         order_in_db = session.exec(stmt).all()
         return paginate(order_in_db)
 
@@ -102,8 +102,16 @@ async def modify_distribution_status(order_to_modify: OrderStatusModifyModel, us
                 return fail_result("修改订单状态失败!")
             orderContent.current_status = order_to_modify.orderNewStatus
 
+            # 如果刚刚开始配送，则登记工作人员
+            if (orderContent.server_id is None or orderContent.server_id == -1) and order_to_modify.orderNewStatus == 1:
+                orderContent.server_id = user.id
+
             if order_to_modify.orderNewStatus == 2:
-                orderContent.end_time = time.time()
+                if user.id == orderContent.server_id:
+                    # 订单完成
+                    orderContent.end_time = time.time()
+                else:
+                    return fail_result("工作人员不一致!")
 
             session.add(orderContent)
             session.commit()
