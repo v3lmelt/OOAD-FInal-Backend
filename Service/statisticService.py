@@ -19,7 +19,8 @@ router = APIRouter(
 @router.get("/diner-statistic")
 async def get_diners(user: AccountModel = Depends(get_current_admin)):
     with session_factory() as session:
-        orders = session.query(OrderModel).all()
+        stmt = select(OrderModel).where(OrderModel.end_time != -1)
+        orders = session.exec(stmt).all()
 
         if orders is None or len(orders) == 0:
             return fail_result("当前尚未有订单记录!")
@@ -40,7 +41,7 @@ async def get_diners(user: AccountModel = Depends(get_current_admin)):
 async def get_average_time(user: AccountModel = Depends(get_current_admin)):
     with session_factory() as session:
         try:
-            orders = session.query(OrderModel).all()
+            orders = session.exec(select(OrderModel).where(OrderModel.end_time != -1)).all()
             total = len(orders)
             sum = 0
             for item in orders:
