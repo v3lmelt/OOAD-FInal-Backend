@@ -58,21 +58,18 @@ async def get_workload(id: int, user: AccountModel = Depends(get_current_admin))
             work = session.exec(select(OrderModel).where(OrderModel.server_id == id)).all()
             if work is None or len(work) == 0:
                 return fail_result("该工作人员尚未有服务订单!")
-
             return success_result(len(work))
         except Exception as e:
             return fail_result(str(e))
 
 
-@router.get("/get-income/{id}")
-async def get_income(id: int, user: AccountModel = Depends(get_current_admin)):
+@router.get("/get-income/")
+async def get_income(user: AccountModel = Depends(get_current_admin)):
     with session_factory() as session:
+        total_income = 0
         try:
-            total_income = 0
-            work = session.exec(select(OrderModel).where(OrderModel.server_id == id)).all()
-            if work is None or len(work) == 0:
-                return fail_result("该工作人员尚未有服务订单!")
-            for item in work:
+            orders = session.exec(select(OrderModel)).all()
+            for item in orders:
                 total_income += item.total_price
             return success_result(total_income)
         except Exception as e:
