@@ -22,3 +22,12 @@ async def add_cash(add_cash_info: AddCashModel, user: AccountModel = Depends(get
         user_in_db.cash += add_cash_info.cash_to_add
         session.commit()
     return success_result("操作成功!")
+
+
+@router.get("/get-cash")
+async def get_cash(user: AccountModel = Depends(get_current_user)):
+    with session_factory() as session:
+        try:
+            return success_result(user.cash)
+        except Exception as e:
+            return fail_result(str(e))

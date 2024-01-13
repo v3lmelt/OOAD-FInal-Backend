@@ -13,6 +13,8 @@ class OrderModel(SQLModel, table=True):
     end_time: Optional[int] = Field(default=-1)
     seat_id: Optional[int] = Field(default=-1)
 
+    order_user_id: Optional[int] = Field(default=None, foreign_key="accountmodel.id")
+
     # 当前状态，0表示还未配餐，1表示正在配餐，2表示配餐完成。
     current_status: Optional[int] = Field(default=0)
     total_price: Optional[float] = Field(default=0.0)

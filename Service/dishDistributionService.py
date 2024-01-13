@@ -66,7 +66,8 @@ async def submit_order(order_content: list[OrderContentModel], seat_id: int, use
             # quantity: int
 
             json_order_content = json.dumps(order_content, default=OrderContentModel.serializeOrderContent)
-            order_obj = OrderModel(order_content=json_order_content, start_time=time.time(), total_price=total_price, seat_id=seat_id)
+            order_obj = OrderModel(order_content=json_order_content, start_time=time.time(), total_price=total_price, seat_id=seat_id,
+                                   order_user_id=user.id)
 
             session.add(order_obj)
             session.commit()
@@ -83,11 +84,19 @@ async def get_order_by_id(id: int, user: AccountModel = Depends(get_current_user
             return fail_result("该订单不存在!")
         return success_result(order)
 
-# 获取所有订单内容
+# 获取所有订单内容，供员工使用
+@router.get("/get-order-staff")
+async def get_order_staff(user: AccountModel = Depends(get_current_user)) -> Page[OrderModel]:
+    with session_factory() as session:
+        stmt = select(OrderModel).where(and_(OrderModel.current_status != 2, or_(OrderModel.server_id is None, OrderModel.server_id == user.id)))
+        order_in_db = session.exec(stmt).all()
+        return paginate(order_in_db)
+
+# 获取所有订单内容，供用户使用
 @router.get("/get-order")
 async def get_order(user: AccountModel = Depends(get_current_user)) -> Page[OrderModel]:
     with session_factory() as session:
-        stmt = select(OrderModel).where(and_(OrderModel.current_status != 2, or_(OrderModel.server_id is None, OrderModel.server_id == user.id)))
+        stmt = select(OrderModel).where(OrderModel.order_user_id == user.id)
         order_in_db = session.exec(stmt).all()
         return paginate(order_in_db)
 
@@ -118,7 +127,3 @@ async def modify_distribution_status(order_to_modify: OrderStatusModifyModel, us
         except Exception as e:
             return fail_result(str(e))
     return success_result("修改订单状态成功!")
-
-
-
-
