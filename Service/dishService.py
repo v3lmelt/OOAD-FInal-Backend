@@ -53,7 +53,7 @@ async def delete_dish_by_id(id: int):
 
 # 添加指定菜品，修改指定菜品也是在这里！
 @router.post("/add-dish")
-async def add_book(dish_to_add: DishModel):
+async def add_dish(dish_to_add: DishModel):
     with session_factory() as session:
         try:
             # 检查是否已存在菜品
@@ -76,7 +76,7 @@ async def add_book(dish_to_add: DishModel):
 
 # 模糊查找指定的菜品
 @router.post("/find-dish")
-async def find_book(dish_to_find: DishQueryModel) -> Page[DishModel]:
+async def find_dish(dish_to_find: DishQueryModel) -> Page[DishModel]:
     with session_factory() as session:
         try:
             query = select(DishModel)

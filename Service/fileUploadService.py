@@ -17,7 +17,7 @@ router = APIRouter(
 
 
 @router.post("/images", response_model=ResultModel)
-async def book_cover_upload(file: UploadFile):
+async def dish_cover_upload(file: UploadFile):
     file.filename = f"book_{time.time()}.jpg"
     # 保存地址
     save_path = STATIC_FILE_DIRECTORY
@@ -33,7 +33,7 @@ async def book_cover_upload(file: UploadFile):
 
 # 根据文件id进行图像的获取
 @router.get("/images/{file_name}")
-async def get_book_cover_by_ID(file_name: str):
+async def get_dish_cover_by_id(file_name: str):
     with session_factory() as session:
         try:
             path = os.path.join(STATIC_FILE_DIRECTORY, file_name)
