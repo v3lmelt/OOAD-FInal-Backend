@@ -16,10 +16,7 @@ router = APIRouter(
 @router.post("/add")
 async def add_cash(add_cash_info: AddCashModel, user: AccountModel = Depends(get_current_user)):
     with session_factory() as session:
-        user_in_db = session.get(AccountModel, add_cash_info.user_id)
-        if user_in_db is None:
-            return fail_result("该用户不存在!")
-        user_in_db.cash += add_cash_info.cash_to_add
+        user.cash += add_cash_info.cash_to_add
         session.commit()
     return success_result("操作成功!")
 
