@@ -16,6 +16,7 @@ router = APIRouter(
 @router.post("/add")
 async def add_cash(add_cash_info: AddCashModel, user: AccountModel = Depends(get_current_user)):
     with session_factory() as session:
+        user = session.get(AccountModel, user.id)
         user.cash += add_cash_info.cash_to_add
         session.commit()
     return success_result("操作成功!")
